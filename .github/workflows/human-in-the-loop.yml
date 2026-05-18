@@ -1,0 +1,34 @@
+# 🛡️ GH-600 Sandbox: SDLC Guardrails & Agent Invocation
+# Concept: Human-in-the-loop (HITL) and Least Privilege
+
+name: Agentic Tender Response Drafter
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  draft_response:
+    runs-on: ubuntu-latest
+    # GH-600 Exam Concept: Environment protection enforces Human-in-the-Loop!
+    # The agent cannot run this job until a human clicks "Approve" in GitHub.
+    environment: 
+      name: agent-approval-required
+    
+    # GH-600 Exam Concept: Least Privilege Access
+    permissions:
+      contents: write # Needed to create a branch
+      pull-requests: write # Needed to open the PR
+      issues: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Invoke Custom GitHub Copilot Agent
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // This represents an agent being invoked within the SDLC boundary
+            console.log("Agent is reading issue context...");
+            console.log("Agent is drafting response...");
+            console.log("Agent is opening a Pull Request for human review...");
