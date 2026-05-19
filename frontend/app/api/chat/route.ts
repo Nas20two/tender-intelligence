@@ -17,15 +17,25 @@ export async function POST(req: Request) {
     console.log("[API] Received query:", message);
     
     // Extract keyword from user message
-    const userMessage = message.toLowerCase();
+    const userMessage = message.toLowerCase().trim();
     let searchKeyword = "";
-    if (userMessage.includes("cyber")) searchKeyword = "cybersecurity";
+    
+    // Check if it's a contract ID search (starts with CN followed by numbers)
+    const isContractId = userMessage.startsWith('cn') && /^cn\d+$/.test(userMessage);
+    
+    if (isContractId) {
+      // Pass the contract ID directly for exact matching
+      searchKeyword = userMessage;
+    } else if (userMessage.includes("cyber")) searchKeyword = "cybersecurity";
     else if (userMessage.includes("cloud")) searchKeyword = "cloud";
     else if (userMessage.includes("health")) searchKeyword = "health";
     else if (userMessage.includes("infrastructure")) searchKeyword = "infrastructure";
     else if (userMessage.includes("consult")) searchKeyword = "consulting";
     else if (userMessage.includes("software")) searchKeyword = "software";
     else if (userMessage.includes("it ")) searchKeyword = "IT";
+    else if (userMessage === "find all tenders" || userMessage === "show all" || userMessage === "all tenders") {
+      searchKeyword = ""; // Empty keyword returns all
+    }
 
     // Try MCP server first (if configured), fallback to direct API
     let tenders: any[] = [];
