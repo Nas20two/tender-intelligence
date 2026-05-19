@@ -206,18 +206,20 @@ export default function TenderIntelligencePage() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
+    <div className="flex h-screen w-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
       {/* Left Sidebar */}
-      <Sidebar
-        activeItem={activeNavItem}
-        onItemClick={setActiveNavItem}
-        pendingApprovals={approvalItem ? 1 : 0}
-      />
+      <div className="hidden md:block h-full shrink-0">
+        <Sidebar
+          activeItem={activeNavItem}
+          onItemClick={setActiveNavItem}
+          pendingApprovals={approvalItem ? 1 : 0}
+        />
+      </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 min-w-0">
+      <div className="flex flex-1 min-w-0 min-h-0">
         {/* Center - Content */}
-        <div className="flex-1 min-w-0 h-screen overflow-y-auto">
+        <div className="flex-1 min-w-0 min-h-0 h-full overflow-hidden">
           {activeNavItem === "about" ? (
             <AboutPage />
           ) : (
@@ -230,7 +232,7 @@ export default function TenderIntelligencePage() {
         </div>
 
         {/* Right - Context Panel with Tabs */}
-        <div className="w-full lg:w-[480px] shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 h-screen overflow-y-auto hidden lg:block">
+        <div className="hidden lg:block w-[480px] shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 h-full overflow-hidden">
           <Tabs defaultValue="context" className="w-full">
             <TabsList className="w-full grid grid-cols-2 rounded-none border-b">
               <TabsTrigger value="context">Context</TabsTrigger>

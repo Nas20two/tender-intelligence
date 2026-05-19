@@ -21,11 +21,13 @@ export async function POST(req: Request) {
     let searchKeyword = "";
     
     // Check if it's a contract ID search (starts with CN followed by numbers)
-    const isContractId = userMessage.startsWith('cn') && /^cn\d+$/.test(userMessage);
+    // Remove any whitespace and normalize for contract ID matching
+    const normalizedMessage = userMessage.replace(/\s/g, '');
+    const isContractId = normalizedMessage.startsWith('cn') && /^cn\d+$/i.test(normalizedMessage);
     
     if (isContractId) {
-      // Pass the contract ID directly for exact matching
-      searchKeyword = userMessage;
+      // Pass the contract ID directly for exact matching (lowercase for consistent comparison)
+      searchKeyword = normalizedMessage.toLowerCase();
     } else if (userMessage.includes("cyber")) searchKeyword = "cybersecurity";
     else if (userMessage.includes("cloud")) searchKeyword = "cloud";
     else if (userMessage.includes("health")) searchKeyword = "health";

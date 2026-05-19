@@ -152,8 +152,8 @@ export function ContextPanel({ tenderData, allTenders = [], approvalItem, onAppr
   }
 
   return (
-    <div className="flex flex-col h-full bg-card border-l border-border">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full bg-card">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full w-full">
         <div className="px-4 pt-4 pb-0 border-b border-border">
           <TabsList className="w-full grid grid-cols-2 h-10">
             <TabsTrigger value="raw-data" className="text-xs gap-1.5">
@@ -172,8 +172,8 @@ export function ContextPanel({ tenderData, allTenders = [], approvalItem, onAppr
           </TabsList>
         </div>
 
-        <TabsContent value="raw-data" className="flex-1 mt-0 overflow-hidden">
-          <ScrollArea className="h-full">
+        <TabsContent value="raw-data" className="flex-1 mt-0 overflow-hidden relative">
+          <ScrollArea className="h-full w-full">
             {tenderData ? (
               <div className="p-4 space-y-4">
                 {/* Header */}
@@ -321,8 +321,8 @@ export function ContextPanel({ tenderData, allTenders = [], approvalItem, onAppr
           </ScrollArea>
         </TabsContent>
 
-        <TabsContent value="approvals" className="flex-1 mt-0 overflow-hidden">
-          <ScrollArea className="h-full">
+        <TabsContent value="approvals" className="flex-1 mt-0 overflow-hidden relative">
+          <ScrollArea className="h-full w-full">
             {approvalItem ? (
               <div className="p-4 space-y-4">
                 {/* Security Header */}
