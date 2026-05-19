@@ -85,15 +85,16 @@ export default function TenderIntelligencePage() {
   const simulateAgentResponse = useCallback(async (userQuery: string) => {
     setIsLoading(true)
     
+    const timestamp = Date.now();
     const userMessage: Message = {
-      id: `msg_${Date.now()}`,
+      id: `msg_user_${timestamp}`,
       role: "user",
       content: userQuery,
       timestamp: new Date()
     }
     setMessages(prev => [...prev, userMessage])
 
-    const tempMessageId = `msg_${Date.now() + 1}`;
+    const tempMessageId = `msg_assistant_${timestamp}_${Math.random().toString(36).substr(2, 9)}`;
     setMessages(prev => [...prev, {
       id: tempMessageId,
       role: "assistant",
@@ -105,7 +106,10 @@ export default function TenderIntelligencePage() {
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        },
         body: JSON.stringify({ message: userQuery })
       });
 
