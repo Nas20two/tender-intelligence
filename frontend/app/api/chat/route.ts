@@ -37,6 +37,9 @@ export async function POST(req: Request) {
     else if (userMessage.includes("it ")) searchKeyword = "IT";
     else if (userMessage === "find all tenders" || userMessage === "show all" || userMessage === "all tenders") {
       searchKeyword = ""; // Empty keyword returns all
+    } else {
+      // For any other search (like contract titles), use the raw message for partial matching
+      searchKeyword = userMessage;
     }
 
     // Try MCP server first (if configured), fallback to direct API
