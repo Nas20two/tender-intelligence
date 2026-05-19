@@ -239,7 +239,7 @@ export default function TenderIntelligencePage() {
           variant="outline"
           size="sm"
           onClick={() => setRightPanelOpen(!rightPanelOpen)}
-          className="absolute right-4 top-4 z-50 bg-white dark:bg-slate-900 shadow-sm"
+          className="absolute right-4 bottom-4 z-50 bg-white dark:bg-slate-900 shadow-md"
         >
           {rightPanelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
           <span className="ml-2 hidden sm:inline">{rightPanelOpen ? 'Hide' : 'Details'}</span>
