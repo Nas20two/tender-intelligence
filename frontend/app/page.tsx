@@ -6,6 +6,8 @@ import { AgentChat, Message, AgentStep } from "@/components/tender-intelligence/
 import { ContextPanel, TenderData, ApprovalItem } from "@/components/tender-intelligence/context-panel"
 import { InsightsPanel } from "@/components/tender-intelligence/insights-panel"
 import { AboutPage } from "@/components/tender-intelligence/about-page"
+import { MobileNav } from "@/components/tender-intelligence/mobile-nav"
+import { DesktopBanner } from "@/components/tender-intelligence/desktop-banner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { PanelRightOpen, PanelRightClose } from "lucide-react"
@@ -58,10 +60,10 @@ This week's analysis identified 3 high-value cybersecurity opportunities in NSW:
 
 1. Cybersecurity Assessment Services - $2.45M (Closes: Jan 31)
    Entity: NSW Department of Customer Service
-   
+
 2. SOC Operations Managed Services - $4.2M (Closes: Feb 15)
    Entity: NSW Treasury
-   
+
 3. Identity & Access Management - $1.8M (Closes: Feb 28)
    Entity: Service NSW
 
@@ -80,11 +82,11 @@ export default function TenderIntelligencePage() {
   const [tenderData, setTenderData] = useState<TenderData | null>(null)
   const [allTenders, setAllTenders] = useState<any[]>([])
   const [approvalItem, setApprovalItem] = useState<ApprovalItem | null>(mockApprovalItem)
-  const [rightPanelOpen, setRightPanelOpen] = useState(true)
+  const [rightPanelOpen, setRightPanelOpen] = useState(false)
 
   const simulateAgentResponse = useCallback(async (userQuery: string) => {
     setIsLoading(true)
-    
+
     const timestamp = Date.now();
     const userMessage: Message = {
       id: `msg_user_${timestamp}`,
@@ -106,7 +108,7 @@ export default function TenderIntelligencePage() {
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache, no-store, must-revalidate'
         },
@@ -115,8 +117,8 @@ export default function TenderIntelligencePage() {
 
       const data = await response.json();
 
-      setMessages(prev => prev.map(msg => 
-        msg.id === tempMessageId 
+      setMessages(prev => prev.map(msg =>
+        msg.id === tempMessageId
           ? {
               id: tempMessageId,
               role: "assistant",
@@ -179,8 +181,8 @@ export default function TenderIntelligencePage() {
 
     } catch (error) {
       console.error(error);
-      setMessages(prev => prev.map(msg => 
-        msg.id === tempMessageId 
+      setMessages(prev => prev.map(msg =>
+        msg.id === tempMessageId
           ? { ...msg, content: "Error connecting to MCP server.", steps: [{ id: "err", status: "error", label: "Connection Failed" }] }
           : msg
       ));
@@ -213,18 +215,20 @@ export default function TenderIntelligencePage() {
   }
 
   return (
-    <div className="flex h-screen w-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
-      {/* Left Sidebar */}
-      <div className="hidden md:block h-full shrink-0">
-        <Sidebar
-          activeItem={activeNavItem}
-          onItemClick={setActiveNavItem}
-          pendingApprovals={approvalItem ? 1 : 0}
-        />
-      </div>
+    <>
+      <DesktopBanner />
+      <div className="flex h-screen w-screen bg-slate-50 dark:bg-slate-950 overflow-hidden pt-0 lg:pt-0">
+        {/* Left Sidebar */}
+        <div className="hidden md:block h-full shrink-0">
+          <Sidebar
+            activeItem={activeNavItem}
+            onItemClick={setActiveNavItem}
+            pendingApprovals={approvalItem ? 1 : 0}
+          />
+        </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-1 min-w-0 min-h-0 relative">
+        {/* Main Content Area */}
+        <div className="flex flex-1 min-w-0 min-h-0 relative pb-16 lg:pb-0">
         {/* Center - Content */}
         <div className="flex-1 min-w-0 min-h-0 h-full overflow-auto">
           {activeNavItem === "about" ? (
@@ -242,17 +246,17 @@ export default function TenderIntelligencePage() {
         <Button
           size="sm"
           onClick={() => setRightPanelOpen(!rightPanelOpen)}
-          className="absolute right-4 bottom-4 z-50 bg-blue-600/90 hover:bg-blue-700/90 text-white backdrop-blur-md border border-blue-400/30 shadow-lg shadow-blue-900/20 transition-all duration-200"
+          className="absolute right-4 bottom-20 lg:bottom-4 z-50 bg-blue-600/90 hover:bg-blue-700/90 text-white backdrop-blur-md border border-blue-400/30 shadow-lg shadow-blue-900/20 transition-all duration-200"
         >
           {rightPanelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
-          <span className="ml-2 hidden sm:inline font-medium">{rightPanelOpen ? 'Hide' : 'Details'}</span>
+          <span className="ml-2 font-medium">{rightPanelOpen ? 'Hide' : 'Details'}</span>
         </Button>
 
         {/* Right - Context Panel with Tabs */}
         <div className={`
           ${rightPanelOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0 lg:hidden'}
-          fixed lg:static right-0 top-0 h-full w-full sm:w-[400px] lg:w-[480px] 
-          shrink-0 border-l border-slate-200 dark:border-slate-800 
+          fixed lg:static right-0 top-0 h-full w-full sm:w-[400px] lg:w-[480px]
+          shrink-0 border-l border-slate-200 dark:border-slate-800
           bg-white dark:bg-slate-900 z-40 transition-transform duration-300 ease-in-out
           overflow-hidden shadow-2xl lg:shadow-none
         `}>
@@ -263,47 +267,55 @@ export default function TenderIntelligencePage() {
               <PanelRightClose className="w-4 h-4" />
             </Button>
           </div>
-          
-          <Tabs defaultValue="context" className="w-full h-full">
-            <TabsList className="w-full grid grid-cols-2 rounded-none border-b">
-              <TabsTrigger value="context">Context</TabsTrigger>
+
+          <Tabs defaultValue="insights" className="w-full h-full flex flex-col">
+            <TabsList className="w-full grid grid-cols-2 rounded-none border-b shrink-0">
               <TabsTrigger value="insights">AI Insights</TabsTrigger>
+              <TabsTrigger value="context">Details</TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="context" className="m-0 p-4 h-[calc(100%-40px)] overflow-hidden">
-              <ContextPanel
-                tenderData={tenderData}
-                allTenders={allTenders}
-                approvalItem={approvalItem}
-                onApprove={handleApprove}
-                onReject={handleReject}
-              />
+
+            <TabsContent value="insights" className="m-0 flex-1 overflow-hidden">
+              <div className="h-full overflow-y-auto p-4">
+                <InsightsPanel
+                  tender={tenderData ? {
+                    CNID: tenderData.tender.id,
+                    Title: tenderData.tender.title,
+                    Agency: tenderData.tender.procuringEntity.name,
+                    Category: tenderData.tender.mainProcurementCategory,
+                    PublishedDate: tenderData.tender.tenderPeriod.startDate,
+                    Value: `$${tenderData.tender.value.amount.toLocaleString()} ${tenderData.tender.value.currency}`,
+                    description: tenderData.tender.description
+                  } : null}
+                />
+              </div>
             </TabsContent>
-            
-            <TabsContent value="insights" className="m-0 p-4 h-[calc(100%-40px)] overflow-hidden">
-              <InsightsPanel 
-                tender={tenderData ? {
-                  CNID: tenderData.tender.id,
-                  Title: tenderData.tender.title,
-                  Agency: tenderData.tender.procuringEntity.name,
-                  Category: tenderData.tender.mainProcurementCategory,
-                  PublishedDate: tenderData.tender.tenderPeriod.startDate,
-                  Value: `$${tenderData.tender.value.amount.toLocaleString()} ${tenderData.tender.value.currency}`,
-                  description: tenderData.tender.description
-                } : null}
-              />
+
+            <TabsContent value="context" className="m-0 flex-1 overflow-hidden">
+              <div className="h-full overflow-y-auto">
+                <ContextPanel
+                  tenderData={tenderData}
+                  allTenders={allTenders}
+                  approvalItem={approvalItem}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                />
+              </div>
             </TabsContent>
           </Tabs>
         </div>
-        
+
         {/* Overlay for mobile when panel is open */}
         {rightPanelOpen && (
-          <div 
+          <div
             className="lg:hidden fixed inset-0 bg-black/50 z-30"
             onClick={() => setRightPanelOpen(false)}
           />
         )}
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileNav activeItem={activeNavItem} onItemClick={setActiveNavItem} />
     </div>
+    </>
   )
 }

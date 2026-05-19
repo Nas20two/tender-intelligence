@@ -124,7 +124,7 @@ function DataCard({ label, value, icon: Icon }: { label: string; value: string; 
 
 export function ContextPanel({ tenderData, allTenders = [], approvalItem, onApprove, onReject }: ContextPanelProps) {
   const [copied, setCopied] = useState(false)
-  const [activeTab, setActiveTab] = useState<string>("raw-data")
+  const [activeTab, setActiveTab] = useState<string>("details")
 
   const handleCopy = () => {
     if (tenderData) {
@@ -156,13 +156,13 @@ export function ContextPanel({ tenderData, allTenders = [], approvalItem, onAppr
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full w-full">
         <div className="px-4 pt-4 pb-0 border-b border-border">
           <TabsList className="w-full grid grid-cols-2 h-10">
-            <TabsTrigger value="raw-data" className="text-xs gap-1.5">
-              <Code2 className="w-3.5 h-3.5" />
-              Raw Data
+            <TabsTrigger value="details" className="text-xs gap-1.5">
+              <FileText className="w-3.5 h-3.5" />
+              Details
             </TabsTrigger>
             <TabsTrigger value="approvals" className="text-xs gap-1.5">
               <UserCheck className="w-3.5 h-3.5" />
-              Pending Approvals
+              Approvals
               {approvalItem && (
                 <span className="ml-1 w-4 h-4 rounded-full bg-destructive text-[10px] font-bold flex items-center justify-center text-destructive-foreground">
                   1
@@ -172,7 +172,7 @@ export function ContextPanel({ tenderData, allTenders = [], approvalItem, onAppr
           </TabsList>
         </div>
 
-        <TabsContent value="raw-data" className="flex-1 mt-0 overflow-hidden relative">
+        <TabsContent value="details" className="flex-1 mt-0 overflow-hidden relative">
           <ScrollArea className="h-full w-full">
             {tenderData ? (
               <div className="p-4 space-y-4">
@@ -309,12 +309,12 @@ export function ContextPanel({ tenderData, allTenders = [], approvalItem, onAppr
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center p-6">
-                <Code2 className="w-10 h-10 text-muted-foreground/30 mb-3" />
+                <FileText className="w-10 h-10 text-muted-foreground/30 mb-3" />
                 <p className="text-sm text-muted-foreground">
-                  Query data will appear here
+                  No tender selected
                 </p>
                 <p className="text-xs text-muted-foreground/70 mt-1">
-                  Run a search to see raw API responses
+                  Search for tenders in the chat to view details
                 </p>
               </div>
             )}
