@@ -7,6 +7,8 @@ import { ContextPanel, TenderData, ApprovalItem } from "@/components/tender-inte
 import { InsightsPanel } from "@/components/tender-intelligence/insights-panel"
 import { AboutPage } from "@/components/tender-intelligence/about-page"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { PanelRightOpen, PanelRightClose } from "lucide-react"
 
 // Mock tender data matching OCDS standard
 const mockTenderData: TenderData = {
@@ -78,6 +80,7 @@ export default function TenderIntelligencePage() {
   const [tenderData, setTenderData] = useState<TenderData | null>(null)
   const [allTenders, setAllTenders] = useState<any[]>([])
   const [approvalItem, setApprovalItem] = useState<ApprovalItem | null>(mockApprovalItem)
+  const [rightPanelOpen, setRightPanelOpen] = useState(true)
 
   const simulateAgentResponse = useCallback(async (userQuery: string) => {
     setIsLoading(true)
@@ -217,7 +220,7 @@ export default function TenderIntelligencePage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 min-w-0 min-h-0">
+      <div className="flex flex-1 min-w-0 min-h-0 relative">
         {/* Center - Content */}
         <div className="flex-1 min-w-0 min-h-0 h-full overflow-hidden">
           {activeNavItem === "about" ? (
@@ -231,15 +234,47 @@ export default function TenderIntelligencePage() {
           )}
         </div>
 
+        {/* Toggle Button for Right Panel */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setRightPanelOpen(!rightPanelOpen)}
+          className="absolute right-4 top-4 z-50 lg:hidden"
+        >
+          {rightPanelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+        </Button>
+
         {/* Right - Context Panel with Tabs */}
-        <div className="hidden lg:block w-[480px] shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 h-full overflow-hidden">
-          <Tabs defaultValue="context" className="w-full">
+        <div className={`
+          ${rightPanelOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0 lg:hidden'}
+          fixed lg:static right-0 top-0 h-full w-full sm:w-[400px] lg:w-[480px] 
+          shrink-0 border-l border-slate-200 dark:border-slate-800 
+          bg-white dark:bg-slate-900 z-40 transition-transform duration-300 ease-in-out
+          overflow-hidden shadow-2xl lg:shadow-none
+        `}>
+          {/* Mobile Close Button */}
+          <div className="lg:hidden flex items-center justify-between p-4 border-b">
+            <span className="font-semibold">Tender Details</span>
+            <Button variant="ghost" size="sm" onClick={() => setRightPanelOpen(false)}>
+              <PanelRightClose className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          {/* Desktop Toggle */}
+          <div className="hidden lg:flex items-center justify-end p-2 border-b">
+            <Button variant="ghost" size="sm" onClick={() => setRightPanelOpen(!rightPanelOpen)}>
+              {rightPanelOpen ? <PanelRightClose className="w-4 h-4 mr-2" /> : <PanelRightOpen className="w-4 h-4 mr-2" />}
+              {rightPanelOpen ? 'Hide Panel' : 'Show Panel'}
+            </Button>
+          </div>
+          
+          <Tabs defaultValue="context" className="w-full h-[calc(100%-48px)]">
             <TabsList className="w-full grid grid-cols-2 rounded-none border-b">
               <TabsTrigger value="context">Context</TabsTrigger>
               <TabsTrigger value="insights">AI Insights</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="context" className="m-0 p-4">
+            <TabsContent value="context" className="m-0 p-4 h-[calc(100%-40px)] overflow-hidden">
               <ContextPanel
                 tenderData={tenderData}
                 allTenders={allTenders}
@@ -249,7 +284,7 @@ export default function TenderIntelligencePage() {
               />
             </TabsContent>
             
-            <TabsContent value="insights" className="m-0 p-4">
+            <TabsContent value="insights" className="m-0 p-4 h-[calc(100%-40px)] overflow-hidden">
               <InsightsPanel 
                 tender={tenderData ? {
                   CNID: tenderData.tender.id,
@@ -264,6 +299,14 @@ export default function TenderIntelligencePage() {
             </TabsContent>
           </Tabs>
         </div>
+        
+        {/* Overlay for mobile when panel is open */}
+        {rightPanelOpen && (
+          <div 
+            className="lg:hidden fixed inset-0 bg-black/50 z-30"
+            onClick={() => setRightPanelOpen(false)}
+          />
+        )}
       </div>
     </div>
   )
