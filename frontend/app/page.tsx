@@ -234,15 +234,14 @@ export default function TenderIntelligencePage() {
           )}
         </div>
 
-        {/* Toggle Button for Right Panel - Always visible */}
+        {/* Toggle Button for Right Panel - Blue Glass Style */}
         <Button
-          variant="outline"
           size="sm"
           onClick={() => setRightPanelOpen(!rightPanelOpen)}
-          className="absolute right-4 bottom-4 z-50 bg-white dark:bg-slate-900 shadow-md"
+          className="absolute right-4 bottom-4 z-50 bg-blue-600/90 hover:bg-blue-700/90 text-white backdrop-blur-md border border-blue-400/30 shadow-lg shadow-blue-900/20 transition-all duration-200"
         >
           {rightPanelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
-          <span className="ml-2 hidden sm:inline">{rightPanelOpen ? 'Hide' : 'Details'}</span>
+          <span className="ml-2 hidden sm:inline font-medium">{rightPanelOpen ? 'Hide' : 'Details'}</span>
         </Button>
 
         {/* Right - Context Panel with Tabs */}
