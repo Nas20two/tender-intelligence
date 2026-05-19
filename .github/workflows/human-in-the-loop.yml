@@ -1,34 +1,457 @@
-# 🛡️ GH-600 Sandbox: SDLC Guardrails & Agent Invocation
-# Concept: Human-in-the-loop (HITL) and Least Privilege
+# 🛡️ Tender Intelligence — Human-in-the-Loop (HITL) Workflow
+# 
+# This workflow implements GH-600 exam concepts:
+# - Environment protection rules enforce human approval
+# - Least privilege access (minimal permissions)
+# - Audit logging for all agent actions
+# - Separation of concerns: draft vs. send
 
-name: Agentic Tender Response Drafter
+name: 🤖 Tender Response Drafter (HITL)
+
 on:
+  # Trigger 1: When a tender analysis issue is created
   issues:
-    types: [opened]
+    types: [opened, labeled]
+  
+  # Trigger 2: Manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      tender_id:
+        description: 'Tender ID (e.g., CN4892761)'
+        required: true
+        type: string
+      agency:
+        description: 'Procuring Agency'
+        required: true
+        type: string
+      tender_title:
+        description: 'Tender Title'
+        required: true
+        type: string
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - draft_email
+          - draft_response
+          - analyze_tender
+        default: 'draft_email'
 
+# Environment protection rules enforce HITL
+# The agent cannot proceed until a human clicks "Approve" in GitHub UI
 jobs:
-  draft_response:
+  # ============================================
+  # JOB 1: Analyze Tender (No approval needed - read-only)
+  # ============================================
+  analyze:
     runs-on: ubuntu-latest
-    # GH-600 Exam Concept: Environment protection enforces Human-in-the-Loop!
-    # The agent cannot run this job until a human clicks "Approve" in GitHub.
-    environment: 
-      name: agent-approval-required
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.issue.labels.*.name, 'tender-analysis')
     
-    # GH-600 Exam Concept: Least Privilege Access
     permissions:
-      contents: write # Needed to create a branch
-      pull-requests: write # Needed to open the PR
+      contents: read
       issues: read
-
+    
+    outputs:
+      analysis_result: ${{ steps.analyze.outputs.result }}
+      tender_id: ${{ steps.extract.outputs.tender_id }}
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Invoke Custom GitHub Copilot Agent
+      - name: Extract tender info
+        id: extract
         uses: actions/github-script@v7
         with:
           script: |
-            // This represents an agent being invoked within the SDLC boundary
-            console.log("Agent is reading issue context...");
-            console.log("Agent is drafting response...");
-            console.log("Agent is opening a Pull Request for human review...");
+            let tenderId, agency, title;
+            
+            if (context.eventName === 'workflow_dispatch') {
+              tenderId = context.payload.inputs.tender_id;
+              agency = context.payload.inputs.agency;
+              title = context.payload.inputs.tender_title;
+            } else {
+              // Parse from issue body
+              const body = context.payload.issue.body || '';
+              const lines = body.split('\n');
+              tenderId = lines.find(l => l.includes('Tender ID:'))?.split(':')[1]?.trim() || 'UNKNOWN';
+              agency = lines.find(l => l.includes('Agency:'))?.split(':')[1]?.trim() || 'Unknown Agency';
+              title = context.payload.issue.title;
+            }
+            
+            core.setOutput('tender_id', tenderId);
+            core.setOutput('agency', agency);
+            core.setOutput('title', title);
+            
+            console.log(`📋 Analyzing Tender: ${tenderId}`);
+            console.log(`🏢 Agency: ${agency}`);
+            console.log(`📝 Title: ${title}`);
+
+      - name: Analyze tender data
+        id: analyze
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tenderId = '${{ steps.extract.outputs.tender_id }}';
+            const agency = '${{ steps.extract.outputs.agency }}';
+            const title = '${{ steps.extract.outputs.title }}';
+            
+            // Simulate AI analysis
+            const analysis = {
+              tender_id: tenderId,
+              agency: agency,
+              title: title,
+              analyzed_at: new Date().toISOString(),
+              key_requirements: [
+                'Technical capability demonstration',
+                'Past performance evidence',
+                'Price competitiveness',
+                'Compliance with security standards'
+              ],
+              competitive_landscape: 'Medium competition expected',
+              win_probability: '65%',
+              recommended_approach: 'Emphasize past cybersecurity project experience',
+              risks: [
+                'Short submission timeline',
+                'Complex compliance requirements'
+              ]
+            };
+            
+            core.setOutput('result', JSON.stringify(analysis));
+            
+            console.log('✅ Analysis complete');
+            console.log(`📊 Win Probability: ${analysis.win_probability}`);
+
+      - name: Comment analysis results
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const analysis = JSON.parse('${{ steps.analyze.outputs.result }}');
+            
+            const body = `## 🤖 AI Tender Analysis Complete
+            
+**Tender:** ${analysis.tender_id}  
+**Agency:** ${analysis.agency}  
+**Analyzed:** ${new Date(analysis.analyzed_at).toLocaleString()}
+            
+### 📊 Win Probability: ${analysis.win_probability}
+            
+### ✅ Key Requirements
+${analysis.key_requirements.map(r => `- ${r}`).join('\n')}
+            
+### ⚠️ Risks
+${analysis.risks.map(r => `- ${r}`).join('\n')}
+            
+### 💡 Recommended Approach
+${analysis.recommended_approach}
+            
+---
+*Next step: Run workflow with action "draft_response" to generate submission draft (requires HITL approval)*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  # ============================================
+  # JOB 2: Draft Response (Requires HITL Approval)
+  # ============================================
+  draft_response:
+    runs-on: ubuntu-latest
+    needs: analyze
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.action == 'draft_response') ||
+      contains(github.event.issue.labels.*.name, 'draft-response')
+    
+    # 🛡️ GH-600: Environment protection enforces HITL!
+    # The agent cannot proceed until a human clicks "Approve"
+    environment:
+      name: tender-response-approval
+      url: ${{ steps.create_pr.outputs.pr_url }}
+    
+    # 🛡️ GH-600: Least Privilege Access
+    permissions:
+      contents: write      # Create branch
+      pull-requests: write # Create PR
+      issues: read         # Read issue context
+    
+    outputs:
+      pr_url: ${{ steps.create_pr.outputs.pr_url }}
+      pr_number: ${{ steps.create_pr.outputs.pr_number }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate tender response draft
+        id: generate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tenderId = '${{ needs.analyze.outputs.tender_id }}';
+            const analysis = JSON.parse('${{ needs.analyze.outputs.analysis_result }}' || '{}');
+            
+            // Generate response content
+            const responseDraft = `# Tender Response: ${analysis.title || tenderId}
+
+## 1. Executive Summary
+We are pleased to submit our proposal for ${analysis.title || 'this tender opportunity'}. Our organization brings extensive experience in delivering similar projects, with a proven track record of meeting stringent government requirements.
+
+## 2. Technical Capability
+### 2.1 Core Competencies
+- Demonstrated expertise in relevant technical domains
+- Certified professionals with government security clearances
+- Proven methodologies aligned with industry best practices
+
+### 2.2 Past Performance
+[To be completed with actual project references]
+
+## 3. Approach & Methodology
+### 3.1 Project Understanding
+Based on our analysis of the tender requirements:
+${analysis.key_requirements?.map(r => `- ${r}`).join('\n') || '- Requirements analysis pending'}
+
+### 3.2 Proposed Solution
+[Detailed solution approach to be developed]
+
+## 4. Compliance & Risk Management
+### 4.1 Compliance Statement
+We confirm full compliance with all mandatory requirements specified in the tender documentation.
+
+### 4.2 Risk Mitigation
+${analysis.risks?.map(r => `- **${r}**: Mitigation strategy to be detailed`).join('\n') || '- Risk assessment pending'}
+
+## 5. Pricing Structure
+[Competitive pricing to be provided upon further analysis]
+
+---
+*This response draft was generated by Tender Intelligence AI on ${new Date().toISOString()}*
+*⚠️ HUMAN REVIEW REQUIRED: This draft must be reviewed and approved before submission*
+`;
+            
+            core.setOutput('content', responseDraft);
+            core.setOutput('filename', `tender-responses/${tenderId}-response.md`);
+
+      - name: Create branch and commit draft
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          BRANCH_NAME="tender-response/${{ needs.analyze.outputs.tender_id }}-$(date +%s)"
+          git checkout -b $BRANCH_NAME
+          
+          mkdir -p tender-responses
+          cat > ${{ steps.generate.outputs.filename }} << 'EOF'
+          ${{ steps.generate.outputs.content }}
+          EOF
+          
+          git add ${{ steps.generate.outputs.filename }}
+          git commit -m "🤖 AI Draft: Tender response for ${{ needs.analyze.outputs.tender_id }}
+          
+          - Generated by Tender Intelligence
+          - Requires human review and approval
+          - HITL checkpoint: Environment protection enforced"
+          
+          git push origin $BRANCH_NAME
+          
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+        id: commit
+
+      - name: Create Pull Request
+        id: create_pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🤖 AI Draft: Tender Response — ${{ needs.analyze.outputs.tender_id }}`,
+              body: `## 🤖 AI-Generated Tender Response Draft
+              
+**Tender ID:** ${{ needs.analyze.outputs.tender_id }}  
+**Agency:** ${{ needs.analyze.outputs.agency }}  
+**Generated:** ${new Date().toLocaleString()}
+              
+### 🛡️ HITL Checkpoint
+This response was drafted by the Tender Intelligence AI. **Human review is mandatory** before any submission.
+              
+### ✅ Review Checklist
+- [ ] Technical accuracy verified
+- [ ] Past performance examples added
+- [ ] Pricing section completed
+- [ ] Compliance statements validated
+- [ ] Risk mitigation strategies detailed
+- [ ] Final approval from authorized personnel
+              
+### 📊 Analysis Summary
+${JSON.parse('${{ needs.analyze.outputs.analysis_result }}' || '{}').win_probability ? `Win Probability: ${JSON.parse('${{ needs.analyze.outputs.analysis_result }}').win_probability}` : 'Analysis data not available'}
+              
+---
+**⚠️ IMPORTANT:** This PR represents a \`draft\` only. No external communication has been sent. The actual tender submission requires manual action outside this system.`,
+              head: '${{ steps.commit.outputs.branch_name }}',
+              base: 'main'
+            });
+            
+            core.setOutput('pr_url', pr.html_url);
+            core.setOutput('pr_number', pr.number);
+            
+            console.log(`✅ PR created: ${pr.html_url}`);
+
+      - name: Comment on issue
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ✅ Tender Response Draft Ready for Review
+              
+**Pull Request:** ${{ steps.create_pr.outputs.pr_url }}
+              
+### 🛡️ HITL Status: PENDING HUMAN APPROVAL
+              
+The AI has drafted a tender response. A human must review and approve before proceeding.
+              
+### 📋 Next Steps
+1. Review the PR: ${{ steps.create_pr.outputs.pr_url }}
+2. Edit the draft response as needed
+3. Complete the review checklist
+4. Merge when ready
+              
+**⚠️ No external action taken yet.** This is purely a draft for internal review.`
+            });
+
+  # ============================================
+  # JOB 3: Draft Email (Requires HITL Approval)
+  # ============================================
+  draft_email:
+    runs-on: ubuntu-latest
+    needs: analyze
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.action == 'draft_email') ||
+      contains(github.event.issue.labels.*.name, 'draft-email')
+    
+    # 🛡️ GH-600: Environment protection enforces HITL!
+    environment:
+      name: email-approval-required
+    
+    # 🛡️ GH-600: Least Privilege
+    permissions:
+      contents: read
+      issues: write  # Comment on issue
+    
+    steps:
+      - name: Generate email draft
+        id: generate_email
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tenderId = '${{ needs.analyze.outputs.tender_id }}';
+            const analysis = JSON.parse('${{ needs.analyze.outputs.analysis_result }}' || '{}');
+            
+            const emailDraft = {
+              to: "procurement-team@example.gov.au",
+              cc: "legal@ourcompany.com",
+              subject: `Clarification Request: Tender ${tenderId} — ${analysis.title || 'Opportunity'}`,
+              body: `Dear Procurement Team,
+
+We are writing regarding tender opportunity ${tenderId} — "${analysis.title || 'Subject'}".
+
+After our initial review, we would appreciate clarification on the following points:
+
+1. **Technical Requirements**: Could you provide additional detail on the specific security certifications required?
+
+2. **Timeline**: Is there any flexibility in the submission deadline given the complexity of the requirements?
+
+3. **Evaluation Criteria**: Could you confirm the weighting between technical capability and price?
+
+We look forward to your response and appreciate your assistance.
+
+Best regards,
+[Your Name]
+[Your Company]
+
+---
+⚠️ This email was drafted by Tender Intelligence AI and requires human approval before sending.`,
+              risk_level: "low",
+              requires_approval: true
+            };
+            
+            core.setOutput('email', JSON.stringify(emailDraft));
+
+      - name: Comment email draft on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const email = JSON.parse('${{ steps.generate_email.outputs.email }}');
+            
+            github.rest.issues.createComment({
+              issue_number: context.event_name === 'issues' ? context.issue.number : 1,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📧 Email Draft Ready (HITL Approval Required)
+              
+**To:** ${email.to}  
+**CC:** ${email.cc}  
+**Subject:** ${email.subject}
+              
+### 🛡️ Risk Level: ${email.risk_level.toUpperCase()}
+              
+### Email Body
+\`\`\`
+${email.body}
+\`\`\`
+              
+### ✅ Approval Required
+This email **CANNOT** be sent until explicitly approved by an authorized user.
+              
+**To approve:** React with ✅ on this comment  
+**To reject:** React with ❌ on this comment
+              
+---
+*Audit ID: EMAIL-${{ needs.analyze.outputs.tender_id }}-${{ github.run_id }}*`
+            });
+
+  # ============================================
+  # JOB 4: Audit Log (Always runs)
+  # ============================================
+  audit_log:
+    runs-on: ubuntu-latest
+    needs: [analyze, draft_response, draft_email]
+    if: always()
+    
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Log workflow execution
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const auditEntry = {
+              timestamp: new Date().toISOString(),
+              workflow: 'human-in-the-loop.yml',
+              run_id: context.runId,
+              actor: context.actor,
+              event: context.eventName,
+              jobs: {
+                analyze: '${{ needs.analyze.result }}',
+                draft_response: '${{ needs.draft_response.result }}',
+                draft_email: '${{ needs.draft_email.result }}'
+              },
+              hitl_enforced: true,
+              environment_approvals: [
+                'tender-response-approval',
+                'email-approval-required'
+              ]
+            };
+            
+            console.log('=== AUDIT LOG ===');
+            console.log(JSON.stringify(auditEntry, null, 2));
+            console.log('=================');

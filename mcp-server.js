@@ -74,11 +74,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           }
 
           results.push({
-            agency,
-            supplier,
-            description,
-            value: `$${parseFloat(value).toLocaleString('en-US')} AUD`,
-            date: date.split('T')[0]
+            CNID: contract.id || "UNKNOWN",
+            Title: title,
+            Agency: agency,
+            Category: "General",
+            PublishedDate: date,
+            Value: parseFloat(value).toLocaleString('en-US')
           });
         }
       }
