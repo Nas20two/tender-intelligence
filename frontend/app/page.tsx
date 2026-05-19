@@ -261,15 +261,7 @@ export default function TenderIntelligencePage() {
             </Button>
           </div>
           
-          {/* Desktop Toggle */}
-          <div className="hidden lg:flex items-center justify-end p-2 border-b">
-            <Button variant="ghost" size="sm" onClick={() => setRightPanelOpen(!rightPanelOpen)}>
-              {rightPanelOpen ? <PanelRightClose className="w-4 h-4 mr-2" /> : <PanelRightOpen className="w-4 h-4 mr-2" />}
-              {rightPanelOpen ? 'Hide Panel' : 'Show Panel'}
-            </Button>
-          </div>
-          
-          <Tabs defaultValue="context" className="w-full h-[calc(100%-48px)]">
+          <Tabs defaultValue="context" className="w-full h-full">
             <TabsList className="w-full grid grid-cols-2 rounded-none border-b">
               <TabsTrigger value="context">Context</TabsTrigger>
               <TabsTrigger value="insights">AI Insights</TabsTrigger>
