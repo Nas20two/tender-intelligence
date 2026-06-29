@@ -1,0 +1,189 @@
+{
+  "name": "Reckoner Risk Layer",
+  "version": "0.1.0",
+  "description": "Cross-reference bidders and entities against Reckoner's government waste/fraud/abuse findings",
+  "source": "https://thereckoner.info/dashboard",
+  "last_updated": "2026-05-29",
+  "findings_count": 38,
+  "flagged_entities": {
+    "contractors": [
+      {
+        "name": "BAE Systems Australia",
+        "abn": "68 008 423 534",
+        "category": "abuse",
+        "total_contract_value": 8370000000,
+        "donation_amount": 288000,
+        "donation_to_contract_ratio": 29063,
+        "jurisdictions": ["federal"],
+        "sectors": ["defence"],
+        "flags": ["bipartisan_hedging", "direct_sourcing", "nacc_referral"],
+        "lag_months": 11.7,
+        "description": "Donated $288K to Labor and Liberal, landed $8.37B in defence contracts. Key contract: SEA 5000 frigate ($1.89B) direct-sourced. Referred to NACC.",
+        "risk_level": "critical",
+        "source_url": "https://thereckoner.info/finding/bae-systems-donations-defence-contracts"
+      },
+      {
+        "name": "Serco Australia",
+        "abn": "25 073 153 825",
+        "category": "abuse",
+        "total_contract_value": 7130000000,
+        "donation_amount": 115000,
+        "donation_to_contract_ratio": 62000,
+        "jurisdictions": ["federal"],
+        "sectors": ["immigration", "detention"],
+        "flags": ["direct_sourcing", "renewed_without_competition", "allegations_of_harm"],
+        "lag_months": 9.3,
+        "description": "Donated $115K, collected $7.13B running immigration detention for 15 years. Allegations of violence, neglect. Highest ratio in index.",
+        "risk_level": "critical",
+        "source_url": "https://thereckoner.info/finding/serco-donations-immigration-detention-contracts"
+      },
+      {
+        "name": "Boeing Defence Australia",
+        "abn": "99 070 569 474",
+        "category": "abuse",
+        "total_contract_value": 4430000000,
+        "donation_amount": 335000,
+        "donation_to_contract_ratio": 13224,
+        "jurisdictions": ["federal"],
+        "sectors": ["defence", "aviation"],
+        "flags": ["direct_sourcing", "limited_tender", "structural_lock_in"],
+        "lag_months": 15.3,
+        "description": "Donated $335K to Labor and Liberal, $4.43B all through direct sourcing or limited tender. Platform lock-in creates decades of sole-source revenue.",
+        "risk_level": "high",
+        "source_url": "https://thereckoner.info/finding/boeing-donations-defence-contracts"
+      },
+      {
+        "name": "CIMIC Group / CPB Contractors",
+        "abn": "57 002 023 689",
+        "category": "abuse",
+        "total_contract_value": 3080000000,
+        "donation_amount": 539800,
+        "donation_to_contract_ratio": 2846,
+        "jurisdictions": ["federal"],
+        "sectors": ["construction", "infrastructure"],
+        "flags": ["bipartisan_hedging", "limited_tender", "foreign_majority_owned", "post_donation_spike"],
+        "lag_months": 9.0,
+        "description": "Donated $540K to all three parties. $3.08B in contracts, 41% limited tender. 74% post-donation spike. Spanish-owned parent.",
+        "risk_level": "high",
+        "source_url": "https://thereckoner.info/finding/cimic-donations-infrastructure-contracts"
+      },
+      {
+        "name": "Thales Australia",
+        "abn": null,
+        "category": "abuse",
+        "total_contract_value": 2190000000,
+        "donation_amount": 195000,
+        "donation_to_contract_ratio": 11230,
+        "jurisdictions": ["federal"],
+        "sectors": ["defence", "technology"],
+        "flags": ["restricted_tender", "bipartisan_hedging"],
+        "lag_months": null,
+        "description": "Donated $195K to Labor and Liberal, landed $2.2B in defence contracts through restricted tender.",
+        "risk_level": "high",
+        "source_url": "https://thereckoner.info/finding/thales-donations-defence-contracts"
+      },
+      {
+        "name": "Big Four Consultants (PwC, Deloitte, KPMG, EY)",
+        "abn": null,
+        "category": "waste",
+        "total_contract_value": 5000000000,
+        "donation_amount": null,
+        "donation_to_contract_ratio": null,
+        "jurisdictions": ["federal"],
+        "sectors": ["consulting"],
+        "flags": ["revolving_door", "conflict_of_interest", "concentration_risk"],
+        "lag_months": null,
+        "description": "$5B/year on Big Four consulting. 1,270% increase over decade. PwC caught sharing confidential tax policy. 15 firms consume 62% of consulting budget.",
+        "risk_level": "high",
+        "source_url": "https://thereckoner.info/finding/big-four-consulting-5-billion-revolving-door"
+      }
+    ],
+    "departments_agencies": [
+      {
+        "name": "Department of Home Affairs",
+        "category": "governance",
+        "portfolio_value": 23800000000,
+        "jurisdictions": ["federal"],
+        "flags": ["coi_declaration_breach", "ses_oversight_failure"],
+        "description": "11 of 14 SES officers skipped conflict of interest declarations on $23.8B contract portfolio",
+        "risk_level": "critical"
+      },
+      {
+        "name": "NBN Co",
+        "category": "waste",
+        "portfolio_value": 27500000000,
+        "jurisdictions": ["federal"],
+        "flags": ["cost_blowout", "governance_blackout"],
+        "description": "$27.5B cost blowout (93% over estimate). Went 3 years without reporting to shareholders while collecting $2.4B in equity.",
+        "risk_level": "critical"
+      },
+      {
+        "name": "Department of Defence",
+        "category": "waste",
+        "portfolio_value": 5500000000,
+        "jurisdictions": ["federal"],
+        "flags": ["cost_blowout", "fx_movement", "ict_overruns"],
+        "description": "$5.5B FX blowout across 21 projects. $1.8B IT overruns. Multiple procurement failures.",
+        "risk_level": "high"
+      },
+      {
+        "name": "National Disability Insurance Agency",
+        "category": "fraud",
+        "portfolio_value": 6000000000,
+        "jurisdictions": ["federal"],
+        "flags": ["fraud_gap", "control_failure"],
+        "description": "$6-9B/year stolen from NDIS. Before 2024, had 'no real control'. Only caught $142M of $3.4B suspicious claims.",
+        "risk_level": "critical"
+      },
+      {
+        "name": "Services Australia",
+        "category": "waste",
+        "portfolio_value": 5000000000,
+        "jurisdictions": ["federal"],
+        "flags": ["payment_errors", "performance_failure"],
+        "description": "$5B in wrong pension payments over 3 years. Every quarter a miss.",
+        "risk_level": "high"
+      }
+    ],
+    "infrastructure_projects": [
+      {
+        "name": "Suburban Rail Loop (VIC)",
+        "category": "waste",
+        "blowout": 125000000000,
+        "jurisdiction": "VIC",
+        "description": "Budgeted $50B, full lifecycle estimated $216B — 540% blowout",
+        "risk_level": "critical"
+      },
+      {
+        "name": "Cross River Rail (QLD)",
+        "category": "waste",
+        "blowout": 13600000000,
+        "jurisdiction": "QLD",
+        "description": "253% over budget, $5.4B→$19.04B, delayed to 2029+",
+        "risk_level": "critical"
+      },
+      {
+        "name": "Sydney Metro City & Southwest (NSW)",
+        "category": "waste",
+        "blowout": 9000000000,
+        "jurisdiction": "NSW",
+        "description": "$11.5B→$20.5B blowout, CBD complexity underestimated",
+        "risk_level": "high"
+      },
+      {
+        "name": "Victorian Big Build (combined)",
+        "category": "waste",
+        "blowout": 19000000000,
+        "jurisdiction": "VIC",
+        "description": "West Gate Tunnel + Metro Tunnel + North East Link — $19B combined overruns",
+        "risk_level": "critical"
+      }
+    ]
+  },
+  "tier_mapping": {
+    "critical": "automatic exclusion or mandatory enhanced due diligence",
+    "high": "flag for manual review; require additional probity checks",
+    "medium": "note for evaluator; include in risk summary",
+    "low": "informational only"
+  }
+}
