@@ -41,8 +41,11 @@ export default function RootLayout({
             </Link>
 
             <nav className="flex items-center gap-6 ml-8 text-sm">
+              <Link href="/tenders" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
+                Browse Tenders
+              </Link>
               <Link href="/ti" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
-                Tender Discovery
+                AI Search
               </Link>
               <Link href="/te" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
                 Tender Evaluator
