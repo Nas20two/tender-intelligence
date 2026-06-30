@@ -14,6 +14,13 @@ export default function PremiumPage() {
     setLoading(true)
     setError('')
 
+    // Capture lead (async, don't block checkout)
+    fetch('/api/lead-capture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    }).catch(e => console.error('[TI Lead] Capture failed:', e))
+
     try {
       const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
