@@ -34,7 +34,8 @@ export async function POST(req: Request) {
     const session = await response.json();
 
     // Verify payment was successful
-    if (session.payment_status !== 'paid' && session.payment_status !== 'no_payment_required') {
+    // Allow: paid (immediate), no_payment_required (free), unpaid (trial subscriptions)
+    if (!['paid', 'no_payment_required', 'unpaid'].includes(session.payment_status)) {
       return NextResponse.json({ success: false, error: 'Payment not completed' });
     }
 

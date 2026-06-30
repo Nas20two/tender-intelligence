@@ -27,6 +27,7 @@ export async function POST(req: Request) {
     params.append('line_items[0][quantity]', '1');
     params.append('customer_email', email);
     params.append('metadata[source]', 'tender-intelligence');
+    params.append('subscription_data[trial_period_days]', '7');
 
     const response = await fetch(`${STRIPE_API}/checkout/sessions`, {
       method: 'POST',

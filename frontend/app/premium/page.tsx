@@ -75,7 +75,7 @@ export default function PremiumPage() {
           Tender Intelligence Premium
         </h1>
         <p className="text-lg text-muted-foreground mb-8">
-          Unlock unlimited tender searches, AI-powered analysis, and weekly email alerts.
+          Try premium free for 7 days. No upfront payment. Cancel anytime.
         </p>
 
         {/* Pricing Card */}
@@ -83,7 +83,7 @@ export default function PremiumPage() {
           <div className="text-center mb-6">
             <span className="text-5xl font-bold">$19</span>
             <span className="text-lg text-muted-foreground">/month</span>
-            <p className="text-sm text-muted-foreground mt-2">Cancel anytime. No lock-in.</p>
+            <p className="text-sm text-muted-foreground mt-2">7-day free trial. No payment today.</p>
           </div>
 
           <div className="space-y-3 mb-8 text-left">
@@ -115,7 +115,7 @@ export default function PremiumPage() {
             >
               {loading ? 'Processing...' : (
                 <>
-                  Subscribe Now
+                  Start 7-Day Free Trial
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}

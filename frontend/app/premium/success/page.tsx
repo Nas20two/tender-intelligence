@@ -75,8 +75,13 @@ function PremiumSuccessContent() {
       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
         <CheckCircle className="w-8 h-8 text-green-600" />
       </div>
-      <h1 className="text-3xl font-bold mb-3">Welcome to Premium! 🎉</h1>
-      <p className="text-lg text-muted-foreground mb-8">{message}</p>
+      <h1 className="text-3xl font-bold mb-3">Your 7-Day Free Trial is Active! 🎉</h1>
+      <p className="text-lg text-muted-foreground mb-8">Start using all premium features right now. No charge for 7 days.</p>
+
+      <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 text-sm text-left">
+        <p className="font-medium mb-1">📅 Trial ends in 7 days</p>
+        <p className="text-muted-foreground">We'll remind you before it ends. Cancel anytime — no questions asked.</p>
+      </div>
 
       <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mb-8 text-left">
         <h3 className="font-semibold mb-3">Your Premium benefits are now active:</h3>

@@ -164,8 +164,8 @@ export default function TenderDiscoveryPage() {
                         </div>
                         <p className="text-sm text-blue-100 mb-3">
                           {queryCount >= 5
-                            ? "You've used all 5 free searches. Upgrade for unlimited access."
-                            : `${remainingQueries} free searches remaining. Upgrade for unlimited access + email alerts.`}
+                            ? "You've used all 5 free searches. Start a 7-day free trial for unlimited access."
+                            : `${remainingQueries} free searches remaining. Try premium free for 7 days.`}
                         </p>
                         <Link
                           href="/premium"
